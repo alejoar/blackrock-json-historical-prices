@@ -2,7 +2,7 @@ name: Daily data fetch
 
 on:
   schedule:
-    - cron: "0 6 * * *" # Runs every day at 06:00 UTC
+    - cron: "0 23 * * *" # Runs every day at 23:00 UTC
   workflow_dispatch:
     # Allows you to manually trigger this workflow from the GitHub Actions page.
 
