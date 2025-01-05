@@ -2,9 +2,11 @@ name: Daily data fetch
 
 on:
   schedule:
-    - cron: "0 23 * * *" # Runs every day at 23:00 UTC
+    - cron: "0 23 * * *"
   workflow_dispatch:
-    # Allows you to manually trigger this workflow from the GitHub Actions page.
+
+permissions:
+  contents: write
 
 jobs:
   update-data:
@@ -30,6 +32,5 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add "BlackRock ICS US Treasury Fund Premier Acc (USD).json"
-          # Only commit if there are changes
           git diff-index --quiet HEAD || git commit -m "Daily fund value update [skip ci]"
           git push
