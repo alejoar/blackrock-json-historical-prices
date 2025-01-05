@@ -56,7 +56,7 @@ def update_json_file(new_value):
             return
 
     # 3. Prepare today's record
-    today_str = datetime.utcnow().strftime("%Y-%m-%d")
+    today_str = datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
 
     # Helper to create a new record dict
     def create_record(date_str, value):
