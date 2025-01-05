@@ -31,40 +31,58 @@ def fetch_fund_value():
 
 def update_json_file(new_value):
     """
-    Prepends or replaces the data for today's date in the JSON file.
-    - If the latest entry already has today's date, replace it.
-    - Otherwise, add a new entry at the top of the array.
+    - If the most recent entry (data[0]) has the same 'close' value as new_value, do nothing.
+    - Otherwise:
+      - If the latest entry is today's date:
+         - Replace if the value is different.
+      - Else, prepend a new entry.
     """
     # 1. Read the existing JSON
     try:
         with open(JSON_FILE, "r") as f:
             data = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
-        # If the file doesn't exist or is empty/corrupt, start with an empty list
+        # If file doesn't exist or is empty/corrupt, start with an empty list
         data = []
 
-    # 2. Create a new record
-    today_str = datetime.utcnow().strftime("%Y-%m-%d")
-    new_record = {
-        "date": today_str,
-        "open": new_value,
-        "high": new_value,
-        "low": new_value,
-        "close": new_value,
-        "adjusted_close": new_value,
-        "volume": None,
-    }
+    # 2. Check if the most recent (top) entry has the same value
+    if data:
+        latest_value = data[0].get("close")  # 'close', 'open', etc. are the same
+        if latest_value == new_value:
+            # The value is exactly the same as the last entry => do nothing
+            print(
+                f"The last read value ({latest_value}) is the same as the new value ({new_value}). Skipping update."
+            )
+            return
 
-    # 3. Check if the most recent entry in data already has today's date
+    # 3. Prepare today's record
+    today_str = datetime.utcnow().strftime("%Y-%m-%d")
+
+    # Helper to create a new record dict
+    def create_record(date_str, value):
+        return {
+            "date": date_str,
+            "open": value,
+            "high": value,
+            "low": value,
+            "close": value,
+            "adjusted_close": value,
+            "volume": None,
+        }
+
+    new_record = create_record(today_str, new_value)
+
+    # 4. Check if the top entry is today's date
     if data and data[0].get("date") == today_str:
-        # Replace the existing record for today
-        print(f"Found an existing record for {today_str}, replacing it with new data.")
+        # If top entry is today's date, replace it with the new value
+        print(f"Updating record for {today_str} with new value {new_value}.")
         data[0] = new_record
     else:
-        # Prepend the new record if today's date doesn't exist
+        # Otherwise, prepend a new record
+        print(f"Prepending a new record for {today_str} with value {new_value}.")
         data.insert(0, new_record)
 
-    # 4. Save the updated data back to the file
+    # 5. Save the updated data back to the file
     with open(JSON_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
