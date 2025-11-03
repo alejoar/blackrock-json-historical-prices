@@ -26,7 +26,7 @@ def fetch_fund_value():
 
     # Remove "USD " from the text and convert to float
     _, value_str = text_value.split()
-    return float(value_str)
+    return float(value_str.replace(",", "."))
 
 
 def update_json_file(new_value):
